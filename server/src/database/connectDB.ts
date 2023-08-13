@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import { Express } from "express";
+import { Server } from "http";
 
 const options = {
     useUnifiedTopology: true,
@@ -8,7 +8,7 @@ const options = {
     keepAlive: true,
 };
 
-const connectDB = (app: Express, PORT: string | number) => {
+const connectDB = (PORT: string | number, server: Server) => {
     (async () => {
         try {
             // Connect to the database
@@ -18,7 +18,7 @@ const connectDB = (app: Express, PORT: string | number) => {
             );
 
             // Start the server
-            app.listen(PORT, () => {
+            server.listen(PORT, () => {
                 console.log(`Server Port: ${PORT}`);
                 console.log("Connected to mongoDB with mongoose!");
             });
