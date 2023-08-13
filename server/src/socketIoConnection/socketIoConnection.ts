@@ -11,20 +11,18 @@ export const connectSocketIo = (server: ServerType) => {
             "table-reservation-client-user",
             async (reservationFromClient) => {
                 try {
-                    if (reservationFromClient) {
-                        const reservation = new ReservationModel({
-                            tableNumber: reservationFromClient.tableNumber,
-                        });
+                    const reservation = new ReservationModel({
+                        tableNumber: reservationFromClient.tableNumber,
+                    });
 
-                        await reservation.save();
+                    await reservation.save();
 
-                        const reservations = await ReservationModel.find();
-                        // Emit the message back to the frontend
-                        socket.broadcast.emit(
-                            "table-reservation-admin-user",
-                            reservations
-                        );
-                    }
+                    const reservations = await ReservationModel.find();
+                    // Emit the message back to the frontend
+                    socket.broadcast.emit(
+                        "table-reservation-admin-user",
+                        reservations
+                    );
                 } catch (error) {
                     console.log("error", error);
                 }
