@@ -1,20 +1,30 @@
 import { useEffect, useState } from "react";
 import SocketIOService from "../services/SocketIOService";
 
+const initialState = {
+    tableNumber: 0,
+};
+
 const Home = () => {
-    const [test, setTest] = useState(0);
+    const [reservation, setReservation] = useState(initialState);
     useEffect(() => {
         const socket = SocketIOService.getInstance();
-        socket.emit("table-reservation-client-user", {
-            tableNumber: Math.random() * 100,
+        if (!reservation.tableNumber) {
+            console.log("no table number");
+            return;
+        }
+        socket.emit("table-reservation-client-user", reservation);
+    }, [reservation]);
+
+    const handleReservation = () => {
+        setReservation({
+            tableNumber: Math.floor(Math.random() * 14124123),
         });
-    }, [test]);
+    };
 
     return (
         <div>
-            <button onClick={() => setTest(Math.floor(Math.random() * 5))}>
-                Click me!
-            </button>
+            <button onClick={handleReservation}>Click me!</button>
         </div>
     );
 };
