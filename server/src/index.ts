@@ -28,7 +28,7 @@ const PORT = process.env.PORT || 8000;
 // Start the server and connect to the database
 connectDB(PORT, server);
 
+import ReservationRouter from "./routes/reservation";
+
 // Routes
-app.get("/", (req, res) => {
-    res.send("Hello, Express with TypeScript!");
-});
+app.use("/reservations", ReservationRouter);

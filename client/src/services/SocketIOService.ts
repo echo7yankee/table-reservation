@@ -1,14 +1,18 @@
 import { io, Socket } from "socket.io-client";
 
-export type SocketDataType = {
+export type EMITSocketDataType = {
     tableNumber: number;
 };
 
-export type SocketOnCallbackType = (data: SocketDataType) => void;
+export type ONSocketDataType = {
+    id: string;
+} & EMITSocketDataType;
+
+export type SocketOnCallbackType = (data: ONSocketDataType) => void;
 
 interface ISocketIOService {
     on(event: string, callback: SocketOnCallbackType): void;
-    emit(event: string, data: SocketDataType): void;
+    emit(event: string, data: EMITSocketDataType): void;
     disconnect(): void;
 }
 
@@ -27,12 +31,15 @@ export default class SocketIOService implements ISocketIOService {
     }
 
     on(event: string, callback: SocketOnCallbackType) {
-        this.socket.on(event, (data: SocketDataType) => {
+        this.socket.on(event, (data: ONSocketDataType) => {
+            if (!data) {
+                throw new Error("Data not received");
+            }
             callback(data);
         });
     }
 
-    emit(event: string, data: SocketDataType) {
+    emit(event: string, data: EMITSocketDataType) {
         this.socket.emit(event, data, (error: Error) => {
             if (error) {
                 throw new Error(error.message);

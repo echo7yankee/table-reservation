@@ -1,22 +1,31 @@
 import { useEffect, useState } from "react";
-import SocketIOService, { SocketDataType } from "../services/SocketIOService";
+import SocketIOService, { ONSocketDataType } from "../services/SocketIOService";
+import { useDispatch, useSelector } from "react-redux";
+import { getRservations } from "../reduxStore/actions/reservation";
+import { addReservation } from "../reduxStore/slices/reservation";
 
 const AdminDashboard = () => {
-    const [reservations, setReservations] = useState<any>([]);
+    const dispatch = useDispatch();
+
+    const { reservations } = useSelector(
+        (state: any) => state.reservationsReducer
+    );
+
+    useEffect(() => {
+        dispatch(getRservations());
+    }, [dispatch]);
 
     useEffect(() => {
         const socket = SocketIOService.getInstance();
-        socket.on("table-reservation-admin-user", (data: SocketDataType) =>
-            setReservations(data)
+        socket.on("table-reservation-admin-user", (data: any) =>
+            dispatch(addReservation(data))
         );
     }, []);
 
-    console.log("HMM", reservations);
-
     return (
         <div>
-            {reservations?.map((reservation: SocketDataType) => (
-                <h1 key={reservation.tableNumber}>{reservation.tableNumber}</h1>
+            {reservations?.map((reservation: ONSocketDataType) => (
+                <h1 key={reservation.id}>{reservation.tableNumber}</h1>
             ))}
         </div>
     );

@@ -1,12 +1,14 @@
 import { configureStore } from "@reduxjs/toolkit";
-// Import your reducers here
-// import counterReducer from '../features/counter/counterSlice';
+import { useDispatch } from "react-redux";
+import ReservationReducer from "./slices/reservation";
 
 const store = configureStore({
     reducer: {
-        // Add your reducers here
-        // counter: counterReducer,
+        reservationsReducer: ReservationReducer,
     },
 });
 
+export type AppDispatch = typeof store.dispatch;
+
+export const useAppDispatch = () => useDispatch<AppDispatch>();
 export default store;

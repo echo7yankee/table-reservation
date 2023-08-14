@@ -8,11 +8,11 @@ const initialState = {
 const Home = () => {
     const [reservation, setReservation] = useState(initialState);
     useEffect(() => {
-        const socket = SocketIOService.getInstance();
         if (!reservation.tableNumber) {
             console.log("no table number");
             return;
         }
+        const socket = SocketIOService.getInstance();
         socket.emit("table-reservation-client-user", reservation);
     }, [reservation]);
 

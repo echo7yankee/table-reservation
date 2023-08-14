@@ -2,7 +2,7 @@ import BuildResponse from "../buildResponse/buildResponse";
 import { ReservationModel } from "../database/models/reservation";
 
 export default class Reservation extends BuildResponse {
-    getReservations = async (req: Request, res: Response) => {
+    getReservations = async (req: Request, res: any) => {
         try {
             const reservations = await ReservationModel.find();
             if (reservations.length) {
