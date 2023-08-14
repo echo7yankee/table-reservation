@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import SocketIOService, { ONSocketDataType } from "../services/SocketIOService";
 import { useDispatch, useSelector } from "react-redux";
 import { getRservations } from "../reduxStore/actions/reservation";
@@ -20,7 +20,7 @@ const AdminDashboard = () => {
         socket.on("table-reservation-admin-user", (data: any) =>
             dispatch(addReservation(data))
         );
-    }, []);
+    }, [dispatch]);
 
     return (
         <div>
