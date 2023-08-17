@@ -2,18 +2,19 @@ import { io, Socket } from "socket.io-client";
 
 export type EMITSocketDataType = {
     tableNumber: number;
+    tableId: string;
 };
 
 export type ONSocketDataType = {
-    id: string;
+    id?: string;
 } & EMITSocketDataType;
 
-export type SocketOnCallbackType = (data: ONSocketDataType) => void;
+export type SocketOnCallbackType = (data: ONSocketDataType[]) => void;
 
 interface ISocketIOService {
     on(event: string, callback: SocketOnCallbackType): void;
-    emit(event: string, data: EMITSocketDataType): void;
-    disconnect(): void;
+    emit(event: string, data: EMITSocketDataType | string): void;
+    off(event: string): void;
 }
 
 export default class SocketIOService implements ISocketIOService {
@@ -31,7 +32,7 @@ export default class SocketIOService implements ISocketIOService {
     }
 
     on(event: string, callback: SocketOnCallbackType) {
-        this.socket.on(event, (data: ONSocketDataType) => {
+        this.socket.on(event, (data: ONSocketDataType[]) => {
             if (!data) {
                 throw new Error("Data not received");
             }
@@ -39,7 +40,7 @@ export default class SocketIOService implements ISocketIOService {
         });
     }
 
-    emit(event: string, data: EMITSocketDataType) {
+    emit(event: string, data: EMITSocketDataType | string) {
         this.socket.emit(event, data, (error: Error) => {
             if (error) {
                 throw new Error(error.message);
@@ -47,7 +48,7 @@ export default class SocketIOService implements ISocketIOService {
         });
     }
 
-    disconnect() {
-        this.socket.disconnect();
+    off(event: string) {
+        this.socket.off(event);
     }
 }

@@ -2,13 +2,14 @@ import { useEffect } from "react";
 import SocketIOService, { ONSocketDataType } from "../services/SocketIOService";
 import { useDispatch, useSelector } from "react-redux";
 import { getRservations } from "../reduxStore/actions/reservation";
-import { addReservation } from "../reduxStore/slices/reservation";
+import { addReservations } from "../reduxStore/slices/reservation";
+import { RootState } from "../reduxStore/store";
 
 const AdminDashboard = () => {
     const dispatch = useDispatch();
 
     const { reservations } = useSelector(
-        (state: any) => state.reservationsReducer
+        (state: RootState) => state.reservationsReducer
     );
 
     useEffect(() => {
@@ -17,9 +18,16 @@ const AdminDashboard = () => {
 
     useEffect(() => {
         const socket = SocketIOService.getInstance();
-        socket.on("table-reservation-admin-user", (data: any) =>
-            dispatch(addReservation(data))
+        socket.on(
+            "table-reservation-admin-user",
+            (data: ONSocketDataType[]) => {
+                dispatch(addReservations(data));
+            }
         );
+        return () => {
+            socket.off("table-reservation-admin-user");
+            // socket.off("cancel-reservation");
+        };
     }, [dispatch]);
 
     return (

@@ -1,13 +1,22 @@
-import { createSlice } from "@reduxjs/toolkit";
+import { createSlice, nanoid } from "@reduxjs/toolkit";
 import { getRservations } from "../actions/reservation";
+import SocketIOService, {
+    EMITSocketDataType,
+    ONSocketDataType,
+} from "../../services/SocketIOService";
 
 interface InitialStateInterface {
-    reservations: [];
+    reservations: ONSocketDataType[] | null;
+    reservation: EMITSocketDataType;
     isLoading: boolean;
 }
 
 const initialState: InitialStateInterface = {
-    reservations: [],
+    reservations: null,
+    reservation: {
+        tableNumber: 0,
+        tableId: nanoid(5),
+    },
     isLoading: false,
 };
 
@@ -15,8 +24,20 @@ const reservationSlice = createSlice({
     name: "reservation",
     initialState,
     reducers: {
-        addReservation: (state: any, action: any) => {
+        addReservations: (state, action: { payload: ONSocketDataType[] }) => {
             state.reservations = action.payload;
+        },
+        addReservation: (
+            state: any,
+            action: { payload: EMITSocketDataType }
+        ) => {
+            state.reservation = action.payload;
+            // This is for testing, to bypass the phone authentication
+            // const socket = SocketIOService.getInstance();
+            // socket.emit("table-reservation-client-user", action.payload);
+        },
+        clearReservation: (state) => {
+            state.reservation = initialState.reservation;
         },
     },
     extraReducers: {
@@ -33,6 +54,7 @@ const reservationSlice = createSlice({
     },
 });
 
-export const { addReservation } = reservationSlice.actions;
+export const { addReservations, addReservation, clearReservation } =
+    reservationSlice.actions;
 
 export default reservationSlice.reducer;

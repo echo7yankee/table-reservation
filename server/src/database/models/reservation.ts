@@ -5,6 +5,10 @@ const ReservationSchema = new mongoose.Schema({
         type: Number,
         required: true,
     },
+    tableId: {
+        type: String,
+        required: true,
+    },
 });
 
 ReservationSchema.virtual("id").get(function () {
