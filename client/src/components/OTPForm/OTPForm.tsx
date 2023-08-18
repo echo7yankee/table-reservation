@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, ChangeEvent, FormEvent } from "react";
 import { signInWithPhoneNumber } from "firebase/auth";
 import { generateRecaptcha } from "../../utils/GenerateRecaptcha";
 import { authentification } from "../../firebase/firebase-config";
@@ -22,20 +22,19 @@ const OTPForm = () => {
 
     const { confirmationCode, error } = OTPObj;
 
-    const handleOnChange = async (e: any) => {
+    const handleOnChange = async (e: ChangeEvent<HTMLInputElement>) => {
         setOTPObj({
             ...OTPObj,
             confirmationCode: e.target.value,
         });
 
-        const confirmationCodeValue = e.target.value;
+        const confirmationCodeValue: string = e.target.value;
 
         if (confirmationCodeValue.length === 6) {
             const confirmationResult = window.confirmationResult;
             try {
                 await confirmationResult.confirm(confirmationCodeValue);
 
-                // Temporary solution
                 const socket = SocketIOService.getInstance();
                 socket.emit("table-reservation-client-user", reservation);
 
@@ -51,7 +50,7 @@ const OTPForm = () => {
         }
     };
 
-    const handleOnSubmit = async (e: any) => {
+    const handleOnSubmit = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         try {
             setOTPObj({
