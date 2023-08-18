@@ -3,7 +3,7 @@ import { ChangeEvent } from "react";
 type InputTextPropsType = {
     placeholder: string;
     onChange: (e: ChangeEvent<HTMLInputElement>) => void;
-    value: string | number;
+    value: string | number | undefined;
     name: string;
     className?: string | "";
     dataTestId?: string | null;
@@ -22,6 +22,7 @@ const InputText = ({
         onChange,
         value,
         name,
+        ...(value && { value }),
         ...(className && { className }),
         ...(dataTestId && { dataTestId }),
     };

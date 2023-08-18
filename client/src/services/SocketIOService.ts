@@ -1,32 +1,18 @@
 import { io, Socket } from "socket.io-client";
-
-export type EMITSocketDataType = {
-    firstName: string;
-    lastName: string;
-    phoneNumber: string;
-    email: string;
-    date: string;
-    table: string;
-    tableId: string;
-    [key: string]: number | string;
-};
-
-export type ONSocketDataType = {
-    id?: string;
-} & EMITSocketDataType;
+import { ReservationType } from "../interfaces";
 
 export type ONSocketCancelDataType = {
     success: boolean;
     message: string;
 };
 
-export type ONSocketDataUnion = ONSocketDataType[] | ONSocketCancelDataType;
+export type ONSocketDataUnion = ReservationType[] | ONSocketCancelDataType;
 
 export type SocketOnCallbackType = (data: ONSocketDataUnion) => void;
 
 interface ISocketIOService {
     on(event: string, callback: SocketOnCallbackType): void;
-    emit(event: string, data: EMITSocketDataType | string): void;
+    emit(event: string, data: ReservationType | string): void;
     off(event: string): void;
 }
 
@@ -53,7 +39,7 @@ export default class SocketIOService implements ISocketIOService {
         });
     }
 
-    emit(event: string, data: EMITSocketDataType | string) {
+    emit(event: string, data: ReservationType | string) {
         this.socket.emit(event, data, (error: Error) => {
             if (error) {
                 throw new Error(error.message);

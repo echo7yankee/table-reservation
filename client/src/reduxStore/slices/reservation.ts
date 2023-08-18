@@ -1,13 +1,11 @@
 import { createSlice, nanoid } from "@reduxjs/toolkit";
 import { getRservations } from "../actions/reservation";
-import SocketIOService, {
-    EMITSocketDataType,
-    ONSocketDataType,
-} from "../../services/SocketIOService";
+import SocketIOService from "../../services/SocketIOService";
+import { ReservationType } from "../../interfaces";
 
 interface InitialStateInterface {
-    reservations: ONSocketDataType[] | null;
-    reservation: EMITSocketDataType;
+    reservations: ReservationType[] | null;
+    reservation: ReservationType;
     isLoading: boolean;
 }
 
@@ -31,19 +29,19 @@ const reservationSlice = createSlice({
     reducers: {
         addReservations: (
             state: InitialStateInterface,
-            action: { payload: ONSocketDataType[] }
+            action: { payload: ReservationType[] }
         ) => {
             state.reservations = action.payload;
         },
         onChangeReservation: (
             state: InitialStateInterface,
-            action: { payload: EMITSocketDataType }
+            action: { payload: ReservationType }
         ) => {
             state.reservation = action.payload;
         },
         addReservation: (
             state: InitialStateInterface,
-            action: { payload: EMITSocketDataType }
+            action: { payload: ReservationType }
         ) => {
             state.reservation = action.payload;
             // This is for testing, to bypass the phone authentication
