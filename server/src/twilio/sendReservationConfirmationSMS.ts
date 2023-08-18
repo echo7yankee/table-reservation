@@ -1,13 +1,13 @@
 import twilio from "twilio";
 
 type SendReservationConfirmationSMSType = {
-    tableNumber: number;
+    table: number;
     tableId: string;
     phoneNumber: string;
 };
 
 export const sendReservationConfirmationSMS = async ({
-    tableNumber,
+    table,
     tableId,
     phoneNumber = "+40753977077",
 }: SendReservationConfirmationSMSType) => {
@@ -18,7 +18,7 @@ export const sendReservationConfirmationSMS = async ({
             process.env.TWILIO_AUTH_TOKEN
         );
         await twilioClient.messages.create({
-            body: `Your reservation for table ${tableNumber} is confirmed. Reservation code: ${tableId}. This code is needed to confirm your reservation at the restaurant or if you want to cancel it. Thank you for choosing us`,
+            body: `Your reservation for table ${table} is confirmed. Reservation code: ${tableId}. This code is needed to confirm your reservation at the restaurant or if you want to cancel it. Thank you for choosing us`,
             from: process.env.TWILIO_PHONE_NUMBER,
             to: phoneNumber,
         });

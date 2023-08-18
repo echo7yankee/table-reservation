@@ -6,9 +6,9 @@ import SocketIOService from "../../services/SocketIOService";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../../reduxStore/store";
 import { clearReservation } from "../../reduxStore/slices/reservation";
+import InputText from "../InputText/InputText";
 
 const initialOTPObjState = {
-    phoneNumber: "",
     confirmationCode: "",
     error: "",
 };
@@ -20,35 +20,33 @@ const OTPForm = () => {
     );
     const dispatch = useDispatch();
 
-    const { phoneNumber, confirmationCode, error } = OTPObj;
+    const { confirmationCode, error } = OTPObj;
 
     const handleOnChange = async (e: any) => {
         setOTPObj({
             ...OTPObj,
-            [e.target.name]: e.target.value,
+            confirmationCode: e.target.value,
         });
 
-        if (e.target.name === "confirmationCode") {
-            const confirmationCodeValue = e.target.value;
+        const confirmationCodeValue = e.target.value;
 
-            if (confirmationCodeValue.length === 6) {
-                const confirmationResult = (window as any).confirmationResult;
-                try {
-                    await confirmationResult.confirm(confirmationCodeValue);
+        if (confirmationCodeValue.length === 6) {
+            const confirmationResult = window.confirmationResult;
+            try {
+                await confirmationResult.confirm(confirmationCodeValue);
 
-                    // Temporary solution
-                    const socket = SocketIOService.getInstance();
-                    socket.emit("table-reservation-client-user", reservation);
+                // Temporary solution
+                const socket = SocketIOService.getInstance();
+                socket.emit("table-reservation-client-user", reservation);
 
-                    setOTPObj(initialOTPObjState);
-                    dispatch(clearReservation());
-                } catch (error) {
-                    setOTPObj({
-                        ...OTPObj,
-                        confirmationCode: "",
-                        error: "Confirmation code incorrect or expired! Please try again!",
-                    });
-                }
+                setOTPObj(initialOTPObjState);
+                dispatch(clearReservation());
+            } catch (error) {
+                setOTPObj({
+                    ...OTPObj,
+                    confirmationCode: "",
+                    error: "Confirmation code incorrect or expired! Please try again!",
+                });
             }
         }
     };
@@ -60,14 +58,15 @@ const OTPForm = () => {
                 ...OTPObj,
                 error: "",
             });
+
             generateRecaptcha("recaptcha-container");
-            let appVerifier = (window as any).recaptchaVerifier;
+
             const confirmationResult = await signInWithPhoneNumber(
                 authentification,
-                phoneNumber,
-                appVerifier
+                reservation.phoneNumber,
+                window.recaptchaVerifier
             );
-            (window as any).confirmationResult = confirmationResult;
+            window.confirmationResult = confirmationResult;
         } catch (error) {
             console.log("ERROR", error);
             throw new Error("Something went wrong with the reservation");
@@ -77,27 +76,17 @@ const OTPForm = () => {
     return (
         <>
             <form onSubmit={handleOnSubmit}>
-                <input
-                    type="text"
-                    placeholder="Phone number"
-                    name="phoneNumber"
-                    value={phoneNumber}
-                    onChange={handleOnChange}
-                />
-                {phoneNumber.length >= 12 && (
-                    <div>
-                        <input
-                            type="text"
-                            placeholder="OTP Code"
-                            name="confirmationCode"
-                            value={confirmationCode}
-                            onChange={handleOnChange}
-                        />
-                        <button type="submit">
-                            {"Request confirmation code"}
-                        </button>
-                    </div>
-                )}
+                <div>
+                    <InputText
+                        placeholder="Confirmation code"
+                        name="confirmationCode"
+                        value={confirmationCode}
+                        onChange={handleOnChange}
+                    />
+                    <button type="submit">
+                        {window.recaptchaVerifier ? "Resend" : "Get code"}
+                    </button>
+                </div>
             </form>
             {error && <p>{error}</p>}
         </>

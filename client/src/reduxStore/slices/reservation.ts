@@ -14,8 +14,13 @@ interface InitialStateInterface {
 const initialState: InitialStateInterface = {
     reservations: null,
     reservation: {
-        tableNumber: 0,
-        tableId: nanoid(5),
+        firstName: "",
+        lastName: "",
+        phoneNumber: "",
+        email: "",
+        date: "23/12/2021",
+        table: "",
+        tableId: nanoid(5).toUpperCase(),
     },
     isLoading: false,
 };
@@ -24,11 +29,20 @@ const reservationSlice = createSlice({
     name: "reservation",
     initialState,
     reducers: {
-        addReservations: (state, action: { payload: ONSocketDataType[] }) => {
+        addReservations: (
+            state: InitialStateInterface,
+            action: { payload: ONSocketDataType[] }
+        ) => {
             state.reservations = action.payload;
         },
+        onChangeReservation: (
+            state: InitialStateInterface,
+            action: { payload: EMITSocketDataType }
+        ) => {
+            state.reservation = action.payload;
+        },
         addReservation: (
-            state: any,
+            state: InitialStateInterface,
             action: { payload: EMITSocketDataType }
         ) => {
             state.reservation = action.payload;
@@ -40,21 +54,26 @@ const reservationSlice = createSlice({
             state.reservation = initialState.reservation;
         },
     },
-    extraReducers: {
-        [getRservations.pending]: (state) => {
-            state.isLoading = true;
-        },
-        [getRservations.fulfilled]: (state, action) => {
-            state.isLoading = false;
-            state.reservations = action.payload;
-        },
-        [getRservations.rejected]: (state) => {
-            state.isLoading = false;
-        },
+    extraReducers: (builder) => {
+        builder
+            .addCase(getRservations.pending, (state) => {
+                state.isLoading = true;
+            })
+            .addCase(getRservations.fulfilled, (state, action) => {
+                state.isLoading = false;
+                state.reservations = action.payload;
+            })
+            .addCase(getRservations.rejected, (state) => {
+                state.isLoading = false;
+            });
     },
 });
 
-export const { addReservations, addReservation, clearReservation } =
-    reservationSlice.actions;
+export const {
+    addReservations,
+    onChangeReservation,
+    addReservation,
+    clearReservation,
+} = reservationSlice.actions;
 
 export default reservationSlice.reducer;

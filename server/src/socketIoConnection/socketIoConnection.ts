@@ -38,7 +38,18 @@ export const connectSocketIo = (server: ServerType) => {
                     throw new Error("No tableId provided!");
                 }
 
-                await ReservationModel.deleteOne({ tableId });
+                const deletedReservation = await ReservationModel.deleteOne({
+                    tableId,
+                });
+
+                if (!deletedReservation.deletedCount) {
+                    socket.emit("cancel-reservation", {
+                        success: false,
+                        message: `We couldn't find a reservation with the ID ${tableId}. Please double-check your reservation details or contact our support if you have any questions.`,
+                    });
+
+                    return;
+                }
 
                 const reservations = await ReservationModel.find();
                 // Emit the message back to the frontend
@@ -46,6 +57,11 @@ export const connectSocketIo = (server: ServerType) => {
                     "table-reservation-admin-user",
                     reservations
                 );
+
+                socket.emit("cancel-reservation", {
+                    success: true,
+                    message: `We're sorry to hear that you've canceled your reservation for Table ${tableId}. If you change your mind, feel free to make a new reservation with us. We look forward to serving you soon!`,
+                });
             } catch (error) {
                 console.log("error", error);
             }

@@ -1,15 +1,28 @@
 import { io, Socket } from "socket.io-client";
 
 export type EMITSocketDataType = {
-    tableNumber: number;
+    firstName: string;
+    lastName: string;
+    phoneNumber: string;
+    email: string;
+    date: string;
+    table: string;
     tableId: string;
+    [key: string]: number | string;
 };
 
 export type ONSocketDataType = {
     id?: string;
 } & EMITSocketDataType;
 
-export type SocketOnCallbackType = (data: ONSocketDataType[]) => void;
+export type ONSocketCancelDataType = {
+    success: boolean;
+    message: string;
+};
+
+export type ONSocketDataUnion = ONSocketDataType[] | ONSocketCancelDataType;
+
+export type SocketOnCallbackType = (data: ONSocketDataUnion) => void;
 
 interface ISocketIOService {
     on(event: string, callback: SocketOnCallbackType): void;
@@ -32,7 +45,7 @@ export default class SocketIOService implements ISocketIOService {
     }
 
     on(event: string, callback: SocketOnCallbackType) {
-        this.socket.on(event, (data: ONSocketDataType[]) => {
+        this.socket.on(event, (data: ONSocketDataUnion) => {
             if (!data) {
                 throw new Error("Data not received");
             }

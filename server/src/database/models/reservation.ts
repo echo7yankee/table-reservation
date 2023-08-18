@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 
 const ReservationSchema = new mongoose.Schema({
-    tableNumber: {
+    table: {
         type: Number,
         required: true,
     },
