@@ -1,12 +1,12 @@
 import { io, Socket } from "socket.io-client";
 import { ReservationType } from "../interfaces";
 
-export type ONSocketCancelDataType = {
+export type ONSocketConfirmationType = {
     success: boolean;
     message: string;
 };
 
-export type ONSocketDataUnion = ReservationType[] | ONSocketCancelDataType;
+export type ONSocketDataUnion = ReservationType[] | ONSocketConfirmationType;
 
 export type SocketOnCallbackType = (data: ONSocketDataUnion) => void;
 

@@ -16,6 +16,8 @@ export const connectSocketIo = (server: ServerType) => {
                         phoneNumber: reservationFromClient.phoneNumber,
                     });
 
+                    console.log("existingReservation", existingReservation);
+
                     if (existingReservation) {
                         socket.emit("table-reservation-client-user", {
                             success: false,
@@ -29,8 +31,12 @@ export const connectSocketIo = (server: ServerType) => {
                     );
 
                     await reservation.save();
-
                     await sendReservationConfirmationSMS(reservationFromClient);
+
+                    socket.emit("table-reservation-client-user", {
+                        success: true,
+                        message: `Thank you for making a reservation with us. We look forward to serving you soon!`,
+                    });
 
                     const reservations = await ReservationModel.find();
                     // Emit the message back to the frontend admin

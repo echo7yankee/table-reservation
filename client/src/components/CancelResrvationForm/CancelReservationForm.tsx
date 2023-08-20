@@ -1,7 +1,7 @@
 import { FormEvent, useState, ChangeEvent, useEffect } from "react";
 import InputText from "../InputText/InputText";
 import SocketIOService, {
-    ONSocketCancelDataType,
+    ONSocketConfirmationType,
     ONSocketDataUnion,
 } from "../../services/SocketIOService";
 
@@ -29,8 +29,8 @@ const CancelReservationForm = () => {
         socket.on("cancel-reservation", (data: ONSocketDataUnion) => {
             setCancelObj({
                 ...cancelObj,
-                message: (data as ONSocketCancelDataType).message,
-                isError: (data as ONSocketCancelDataType).success,
+                message: (data as ONSocketConfirmationType).message,
+                isError: (data as ONSocketConfirmationType).success,
             });
         });
     }, [socket, cancelObj]);

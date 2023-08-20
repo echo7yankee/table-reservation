@@ -1,16 +1,19 @@
-import { ChangeEvent, useEffect, FormEvent } from "react";
+import { ChangeEvent, useEffect, FormEvent, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import InputText from "../InputText/InputText";
 import { RootState } from "../../reduxStore/store";
 import { capitalizeText } from "../../utils/CapitalizeText";
 import { onChangeReservation } from "../../reduxStore/slices/reservation";
 import SocketIOService, {
+    ONSocketConfirmationType,
     ONSocketDataUnion,
 } from "../../services/SocketIOService";
-import { addReservation } from "../../reduxStore/types";
+import { addReservation, clearReservation } from "../../reduxStore/types";
 import OTPForm from "../OTPForm/OTPForm";
 
 const ReservationForm = () => {
+    const [showOtpForm, setShowOtpForm] = useState<boolean>(false);
+    const [message, setMessage] = useState("");
     const inputs = ["firstName", "lastName", "phoneNumber", "email", "table"];
 
     const dispatch = useDispatch();
@@ -25,7 +28,13 @@ const ReservationForm = () => {
         socket.on(
             "table-reservation-client-user",
             (data: ONSocketDataUnion) => {
-                console.log("HMM", data);
+                if ((data as ONSocketConfirmationType).message) {
+                    dispatch(clearReservation());
+                    window.recaptchaVerifier.clear();
+                    setShowOtpForm(false);
+                }
+
+                setMessage((data as ONSocketConfirmationType).message);
             }
         );
     }, [socket]);
@@ -33,14 +42,17 @@ const ReservationForm = () => {
     const handleOnReserveTableSubmit = (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         dispatch(addReservation(reservation));
-    };
 
-    const showOtpForm =
-        reservation.table &&
-        reservation.firstName &&
-        reservation.lastName &&
-        reservation.phoneNumber &&
-        reservation.email;
+        if (
+            reservation.table &&
+            reservation.firstName &&
+            reservation.lastName &&
+            reservation.phoneNumber &&
+            reservation.email
+        ) {
+            setShowOtpForm(true);
+        }
+    };
 
     return (
         <>
@@ -64,6 +76,7 @@ const ReservationForm = () => {
                 <button type="submit">{"Reserve your table"}</button>
             </form>
             {showOtpForm && <OTPForm />}
+            {message && <p>{message}</p>}
         </>
     );
 };
