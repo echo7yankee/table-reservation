@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import { Express } from "express";
+import { Server } from "http";
 import connectDB from "./connectDB";
 
 jest.mock("mongoose", () => ({
@@ -8,14 +8,14 @@ jest.mock("mongoose", () => ({
 }));
 
 describe("connectDB", () => {
-    let app: Express;
+    let app: Server;
     let listenSpy: jest.SpyInstance;
     let consoleLogSpy: jest.SpyInstance;
 
     beforeEach(() => {
         app = {
             listen: jest.fn(),
-        } as unknown as Express;
+        } as unknown as Server;
         listenSpy = jest.spyOn(app, "listen");
         consoleLogSpy = jest.spyOn(console, "log");
     });
@@ -30,7 +30,7 @@ describe("connectDB", () => {
 
         process.env.MONGO_CONNECT = MONGO_CONNECT;
 
-        await connectDB(app, PORT);
+        await connectDB(PORT, app);
 
         expect(mongoose.connect).toHaveBeenCalledWith(MONGO_CONNECT, {
             useUnifiedTopology: true,
@@ -49,7 +49,7 @@ describe("connectDB", () => {
             new Error("connection error")
         );
 
-        await connectDB(app, PORT);
+        await connectDB(PORT, app);
 
         expect(consoleLogSpy).toHaveBeenCalledWith(
             "Failed to connect",

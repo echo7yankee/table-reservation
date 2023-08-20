@@ -37,7 +37,10 @@ const CancelReservationForm = () => {
 
     return (
         <>
-            <form onSubmit={handleCancellationOnSubmit}>
+            <form
+                onSubmit={handleCancellationOnSubmit}
+                data-testid="form-cancel-reservation"
+            >
                 <InputText
                     value={value}
                     placeholder="Table Id"
@@ -49,7 +52,9 @@ const CancelReservationForm = () => {
                         })
                     }
                 />
-                <button type="submit">{"Confirm"}</button>
+                <button data-testid="cancel-confirm" type="submit">
+                    {"Confirm"}
+                </button>
             </form>
             {message && <p>{message}</p>}
         </>

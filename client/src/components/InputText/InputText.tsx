@@ -24,7 +24,7 @@ const InputText = ({
         name,
         ...(value && { value }),
         ...(className && { className }),
-        ...(dataTestId && { dataTestId }),
+        ...(dataTestId && { "data-testid": dataTestId }),
     };
 
     return <input type="text" {...props} />;
@@ -32,7 +32,7 @@ const InputText = ({
 
 InputText.defaultProps = {
     className: "",
-    dataTestId: null,
+    dataTestId: "input-text",
 };
 
 export default InputText;

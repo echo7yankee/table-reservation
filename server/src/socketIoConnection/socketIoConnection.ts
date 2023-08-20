@@ -16,6 +16,7 @@ export const connectSocketIo = (server: ServerType) => {
                         phoneNumber: reservationFromClient.phoneNumber,
                     });
 
+                    // Don't create reservation if there is an another reservation with the same phone number
                     if (existingReservation) {
                         socket.emit("table-reservation-client-user", {
                             success: false,
@@ -31,6 +32,7 @@ export const connectSocketIo = (server: ServerType) => {
                     await reservation.save();
                     await sendReservationConfirmationSMS(reservationFromClient);
 
+                    // Emit the message back to the frontend client
                     socket.emit("table-reservation-client-user", {
                         success: true,
                         message: `Thank you for making a reservation with us. We look forward to serving you soon!`,
@@ -58,6 +60,7 @@ export const connectSocketIo = (server: ServerType) => {
                     tableId,
                 });
 
+                // Return error if there is no reservation with the provided tableId
                 if (!deletedReservation.deletedCount) {
                     socket.emit("cancel-reservation", {
                         success: false,
@@ -74,6 +77,7 @@ export const connectSocketIo = (server: ServerType) => {
                     reservations
                 );
 
+                // Emit the message back to the frontend client
                 socket.emit("cancel-reservation", {
                     success: true,
                     message: `We're sorry to hear that you've canceled your reservation for Table ${tableId}. If you change your mind, feel free to make a new reservation with us. We look forward to serving you soon!`,
