@@ -16,8 +16,6 @@ export const connectSocketIo = (server: ServerType) => {
                         phoneNumber: reservationFromClient.phoneNumber,
                     });
 
-                    console.log("existingReservation", existingReservation);
-
                     if (existingReservation) {
                         socket.emit("table-reservation-client-user", {
                             success: false,

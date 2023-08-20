@@ -22,22 +22,23 @@ const ReservationForm = () => {
         (state: RootState) => state.reservationsReducer
     );
 
-    const socket = SocketIOService.getInstance();
-
     useEffect(() => {
+        const socket = SocketIOService.getInstance();
         socket.on(
             "table-reservation-client-user",
             (data: ONSocketDataUnion) => {
-                if ((data as ONSocketConfirmationType).message) {
+                if ((data as ONSocketConfirmationType).success) {
                     dispatch(clearReservation());
-                    window.recaptchaVerifier.clear();
                     setShowOtpForm(false);
+                    if (window.recaptchaVerifier) {
+                        window.recaptchaVerifier.clear();
+                    }
                 }
 
                 setMessage((data as ONSocketConfirmationType).message);
             }
         );
-    }, [socket]);
+    }, [dispatch]);
 
     const handleOnReserveTableSubmit = (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();

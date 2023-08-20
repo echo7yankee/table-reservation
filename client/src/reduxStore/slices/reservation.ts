@@ -45,8 +45,8 @@ const reservationSlice = createSlice({
         ) => {
             state.reservation = action.payload;
             // This is for testing, to bypass the phone authentication
-            // const socket = SocketIOService.getInstance();
-            // socket.emit("table-reservation-client-user", action.payload);
+            const socket = SocketIOService.getInstance();
+            socket.emit("table-reservation-client-user", action.payload);
         },
         clearReservation: (state) => {
             state.reservation = initialState.reservation;
