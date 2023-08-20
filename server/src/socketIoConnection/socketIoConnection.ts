@@ -12,6 +12,18 @@ export const connectSocketIo = (server: ServerType) => {
             "table-reservation-client-user",
             async (reservationFromClient) => {
                 try {
+                    const existingReservation = await ReservationModel.findOne({
+                        phoneNumber: reservationFromClient.phoneNumber,
+                    });
+
+                    if (existingReservation) {
+                        socket.emit("table-reservation-client-user", {
+                            success: false,
+                            message: `You already have a reservation with us. Please contact our support if you have any questions.`,
+                        });
+                        return;
+                    }
+
                     const reservation = new ReservationModel(
                         reservationFromClient
                     );
@@ -21,7 +33,7 @@ export const connectSocketIo = (server: ServerType) => {
                     await sendReservationConfirmationSMS(reservationFromClient);
 
                     const reservations = await ReservationModel.find();
-                    // Emit the message back to the frontend
+                    // Emit the message back to the frontend admin
                     socket.broadcast.emit(
                         "table-reservation-admin-user",
                         reservations
@@ -52,7 +64,7 @@ export const connectSocketIo = (server: ServerType) => {
                 }
 
                 const reservations = await ReservationModel.find();
-                // Emit the message back to the frontend
+                // Emit the message back to the frontend admin
                 socket.broadcast.emit(
                     "table-reservation-admin-user",
                     reservations

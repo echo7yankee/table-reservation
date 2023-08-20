@@ -3,9 +3,8 @@ import { signInWithPhoneNumber } from "firebase/auth";
 import { generateRecaptcha } from "../../utils/GenerateRecaptcha";
 import { authentification } from "../../firebase/firebase-config";
 import SocketIOService from "../../services/SocketIOService";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import { RootState } from "../../reduxStore/store";
-import { clearReservation } from "../../reduxStore/slices/reservation";
 import InputText from "../InputText/InputText";
 
 const initialOTPObjState = {
@@ -18,7 +17,6 @@ const OTPForm = () => {
     const { reservation } = useSelector(
         (state: RootState) => state.reservationsReducer
     );
-    const dispatch = useDispatch();
 
     const { confirmationCode, error } = OTPObj;
 
@@ -39,7 +37,6 @@ const OTPForm = () => {
                 socket.emit("table-reservation-client-user", reservation);
 
                 setOTPObj(initialOTPObjState);
-                dispatch(clearReservation());
             } catch (error) {
                 setOTPObj({
                     ...OTPObj,
