@@ -17,20 +17,24 @@ export const connectSocketIo = (server: ServerType) => {
                     });
 
                     // Don't create reservation if there is an another reservation with the same phone number
-                    if (existingReservation) {
-                        socket.emit("table-reservation-client-user", {
-                            success: false,
-                            message: `You already have a reservation with us. Please contact our support if you have any questions.`,
-                        });
-                        return;
-                    }
+                    // TODO: Uncomment this code when you want to prevent users from making multiple reservations
+                    // if (existingReservation) {
+                    //     socket.emit("table-reservation-client-user", {
+                    //         success: false,
+                    //         message: `You already have a reservation with us. Please contact our support if you have any questions.`,
+                    //     });
+                    //     return;
+                    // }
 
                     const reservation = new ReservationModel(
                         reservationFromClient
                     );
 
                     await reservation.save();
-                    await sendReservationConfirmationSMS(reservationFromClient);
+                    await sendReservationConfirmationSMS({
+                        phoneNumber: reservationFromClient.phoneNumber,
+                        body: `Your reservation for table ${reservationFromClient.table} is confirmed. Reservation code: ${reservationFromClient.tableId}. This code is needed to confirm your reservation at the restaurant or if you want to cancel it. Thank you for choosing us`,
+                    });
 
                     // Emit the message back to the frontend client
                     socket.emit("table-reservation-client-user", {
@@ -50,7 +54,7 @@ export const connectSocketIo = (server: ServerType) => {
             }
         );
 
-        socket.on("cancel-reservation", async (tableId) => {
+        socket.on("cancel-reservation", async ({ tableId, phoneNumber }) => {
             try {
                 if (!tableId) {
                     throw new Error("No tableId provided!");
@@ -81,6 +85,11 @@ export const connectSocketIo = (server: ServerType) => {
                 socket.emit("cancel-reservation", {
                     success: true,
                     message: `We're sorry to hear that you've canceled your reservation for Table ${tableId}. If you change your mind, feel free to make a new reservation with us. We look forward to serving you soon!`,
+                });
+
+                await sendReservationConfirmationSMS({
+                    phoneNumber,
+                    body: `We're sorry to hear that you've canceled your reservation for Table ${tableId}. If you change your mind, feel free to make a new reservation with us. We look forward to serving you soon!`,
                 });
             } catch (error) {
                 console.log("error", error);

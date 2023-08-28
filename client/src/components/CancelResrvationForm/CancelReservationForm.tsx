@@ -6,23 +6,27 @@ import SocketIOService, {
 } from "../../services/SocketIOService";
 
 const initialState = {
-    value: "",
+    tableId: "",
+    phoneNumber: "",
     message: "",
     isError: false,
 };
 
 const CancelReservationForm = () => {
     const [cancelObj, setCancelObj] = useState(initialState);
-    const { value, message } = cancelObj;
+    const { tableId, phoneNumber, message } = cancelObj;
     const socket = SocketIOService.getInstance();
 
     const handleCancellationOnSubmit = (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        if (!value) {
+        if (!tableId) {
             return;
         }
 
-        socket.emit("cancel-reservation", value);
+        socket.emit("cancel-reservation", {
+            tableId,
+            phoneNumber,
+        });
     };
 
     useEffect(() => {
@@ -35,23 +39,39 @@ const CancelReservationForm = () => {
         });
     }, [socket, cancelObj]);
 
+    const inputs = [
+        {
+            name: "tableId",
+            placeholder: "Table Id",
+        },
+        {
+            name: "phoneNumber",
+            placeholder: "Phone Number",
+        },
+    ];
+
     return (
         <>
             <form
                 onSubmit={handleCancellationOnSubmit}
                 data-testid="form-cancel-reservation"
             >
-                <InputText
-                    value={value}
-                    placeholder="Table Id"
-                    name="TableId"
-                    onChange={(e: ChangeEvent<HTMLInputElement>) =>
-                        setCancelObj({
-                            ...cancelObj,
-                            value: e.target.value,
-                        })
-                    }
-                />
+                {inputs.map(({ name, placeholder }) => (
+                    <InputText
+                        key={name}
+                        value={
+                            cancelObj[name as keyof typeof cancelObj] as string
+                        }
+                        placeholder={placeholder}
+                        name={name}
+                        onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                            setCancelObj({
+                                ...cancelObj,
+                                [e.target.name]: e.target.value,
+                            })
+                        }
+                    />
+                ))}
                 <button data-testid="cancel-confirm" type="submit">
                     {"Confirm"}
                 </button>

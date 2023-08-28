@@ -2,12 +2,12 @@ import { render, screen, fireEvent } from "@testing-library/react";
 import CancelReservationForm from "./CancelReservationForm";
 import SocketIOService from "../../services/SocketIOService";
 
-const createCancelReservationForm = () => {
-    jest.spyOn(SocketIOService.getInstance(), "emit");
-    return render(<CancelReservationForm />);
-};
-
 describe("CancelReservationForm", () => {
+    const createCancelReservationForm = () => {
+        jest.spyOn(SocketIOService.getInstance(), "emit");
+        return render(<CancelReservationForm />);
+    };
+
     it("component can be imported", () => {
         expect(CancelReservationForm).toBeDefined();
     });
@@ -23,17 +23,22 @@ describe("CancelReservationForm", () => {
         createCancelReservationForm();
 
         const tableIdInput = screen.getByPlaceholderText("Table Id");
+        const phoneIdInput = screen.getByPlaceholderText("Phone Number");
         const submitButton = screen.getByTestId("cancel-confirm");
 
-        const tableId = "123";
+        fireEvent.change(tableIdInput, {
+            target: { value: "123", phoneNumber: "+40753977077" },
+        });
 
-        fireEvent.change(tableIdInput, { target: { value: tableId } });
+        fireEvent.change(phoneIdInput, {
+            target: { value: "+40753977077" },
+        });
 
         fireEvent.click(submitButton);
 
         expect(SocketIOService.getInstance().emit).toHaveBeenCalledWith(
             "cancel-reservation",
-            tableId
+            { phoneNumber: "+40753977077", tableId: "123" }
         );
     });
 

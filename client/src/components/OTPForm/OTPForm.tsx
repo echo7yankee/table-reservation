@@ -10,6 +10,7 @@ import InputText from "../InputText/InputText";
 const initialOTPObjState = {
     confirmationCode: "",
     error: "",
+    clickedOnce: false,
 };
 
 const OTPForm = () => {
@@ -18,7 +19,7 @@ const OTPForm = () => {
         (state: RootState) => state.reservationsReducer
     );
 
-    const { confirmationCode, error } = OTPObj;
+    const { confirmationCode, error, clickedOnce } = OTPObj;
 
     const handleOnChange = async (e: ChangeEvent<HTMLInputElement>) => {
         setOTPObj({
@@ -39,8 +40,7 @@ const OTPForm = () => {
                 setOTPObj(initialOTPObjState);
             } catch (error) {
                 setOTPObj({
-                    ...OTPObj,
-                    confirmationCode: "",
+                    ...initialOTPObjState,
                     error: "Confirmation code incorrect or expired! Please try again!",
                 });
             }
@@ -52,6 +52,7 @@ const OTPForm = () => {
         try {
             setOTPObj({
                 ...OTPObj,
+                clickedOnce: true,
                 error: "",
             });
 
@@ -64,14 +65,17 @@ const OTPForm = () => {
             );
             window.confirmationResult = confirmationResult;
         } catch (error) {
-            console.log("ERROR", error);
-            throw new Error("Something went wrong with the reservation");
+            console.log("Error", error);
+            setOTPObj({
+                ...initialOTPObjState,
+                error: "Something went wrong with the generation of the code! Please try again!",
+            });
         }
     };
 
     return (
         <>
-            <form onSubmit={handleOnSubmit}>
+            <form onSubmit={handleOnSubmit} data-testid="otp-form">
                 <div>
                     <InputText
                         placeholder="Confirmation code"
@@ -79,12 +83,12 @@ const OTPForm = () => {
                         value={confirmationCode}
                         onChange={handleOnChange}
                     />
-                    <button type="submit">
-                        {window.recaptchaVerifier ? "Resend" : "Get code"}
+                    <button type="submit" data-testid="otp-form-submit-button">
+                        {clickedOnce ? "Resend" : "Get code"}
                     </button>
                 </div>
             </form>
-            {error && <p>{error}</p>}
+            {error && <p data-testid="otp-form-error">{error}</p>}
         </>
     );
 };

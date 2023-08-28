@@ -9,3 +9,8 @@ export type ReservationType = {
     id?: string;
     [key: string]: number | string | undefined;
 };
+
+export type CancelReservationType = {
+    tableId: string;
+    phoneNumber: string;
+};

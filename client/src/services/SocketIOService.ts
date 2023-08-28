@@ -1,5 +1,5 @@
 import { io, Socket } from "socket.io-client";
-import { ReservationType } from "../interfaces";
+import { CancelReservationType, ReservationType } from "../interfaces";
 
 export type ONSocketConfirmationType = {
     success: boolean;
@@ -12,7 +12,7 @@ export type SocketOnCallbackType = (data: ONSocketDataUnion) => void;
 
 interface ISocketIOService {
     on(event: string, callback: SocketOnCallbackType): void;
-    emit(event: string, data: ReservationType | string): void;
+    emit(event: string, data: ReservationType | CancelReservationType): void;
     off(event: string): void;
 }
 
@@ -39,7 +39,7 @@ export default class SocketIOService implements ISocketIOService {
         });
     }
 
-    emit(event: string, data: ReservationType | string) {
+    emit(event: string, data: ReservationType | CancelReservationType) {
         this.socket.emit(event, data, (error: Error) => {
             if (error) {
                 throw new Error(error.message);

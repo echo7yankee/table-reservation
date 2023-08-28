@@ -30,19 +30,19 @@ const ReservationForm = () => {
                 if ((data as ONSocketConfirmationType).success) {
                     dispatch(clearReservation());
                     setShowOtpForm(false);
-                    if (window.recaptchaVerifier) {
-                        window.recaptchaVerifier.clear();
-                    }
                 }
 
                 setMessage((data as ONSocketConfirmationType).message);
             }
         );
+
+        return () => {
+            socket.off("table-reservation-client-user");
+        };
     }, [dispatch]);
 
     const handleOnReserveTableSubmit = (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        dispatch(addReservation(reservation));
 
         if (
             reservation.table &&
@@ -51,13 +51,17 @@ const ReservationForm = () => {
             reservation.phoneNumber &&
             reservation.email
         ) {
+            dispatch(addReservation(reservation));
             setShowOtpForm(true);
         }
     };
 
     return (
         <>
-            <form onSubmit={handleOnReserveTableSubmit}>
+            <form
+                onSubmit={handleOnReserveTableSubmit}
+                data-testid="reservation-form"
+            >
                 {inputs.map((input) => (
                     <InputText
                         key={input}
